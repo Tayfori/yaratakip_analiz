@@ -1,18 +1,11 @@
-# Lightweight requirements - Render Free Tier için optimize edilmiş
-# Memory usage: ~80-150MB (512MB limit için uygun)
+# Ultra Minimal Requirements - Render Free Tier
+# Sadece gerekli paketler, memory: ~40-60MB
 
 fastapi==0.104.1
-uvicorn==0.24.0
+uvicorn[standard]==0.24.0
 pydantic==2.5.0
-python-multipart==0.0.6
 
-# Image processing (lightweight versions)
+# Minimal image processing
 opencv-python-headless==4.8.1.78
 Pillow==10.1.0
 numpy==1.24.4
-
-# Optional monitoring
-psutil==5.9.6
-
-# CORS
-python-dotenv==1.0.0
