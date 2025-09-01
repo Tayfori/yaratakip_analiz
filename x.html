@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>HealTrack • Ameliyat Sonrası İyileşme Takibi</title>
+<meta name="description" content="Ameliyat sonrası yara takibi için kurumsal platform: fotoğraf yükleme, akıllı değerlendirme arayüzü ve raporlama. Makine/derin öğrenme entegrasyonuna hazır."/>
+<meta name="theme-color" content="#0ea5e9"/>
+
+<style>
+  :root{
+    --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --text:#e6eefc;
+    --brand:#0ea5e9; --brand-900:#083344; --brand-700:#0b84bd;
+    --accent:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+    --radius:18px; --shadow:0 10px 30px rgba(2,6,23,.35), 0 1px 0 rgba(255,255,255,.04) inset; --grid-gap:18px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f7fbff; --panel:#fff; --muted:#475569; --text:#0f172a; --brand:#0284c7; --brand-900:#e0f2fe; --brand-700:#0ea5e9; --accent:#16a34a; --warn:#d97706; --danger:#dc2626; --shadow:0 10px 30px rgba(2,6,23,.08), 0 1px 0 rgba(2,6,23,.04) inset; }
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(14,165,233,.25), transparent 60%),
+      radial-gradient(800px 500px at -10% 10%, rgba(34,197,94,.18), transparent 60%),
+      var(--bg);
+    color:var(--text);
+  }
+
+  a{color:inherit}
+  .container{width:min(1200px,92vw); margin-inline:auto}
+  .btn{display:inline-flex; align-items:center; gap:.6rem; padding:.8rem 1.1rem; border-radius:999px; border:1px solid color-mix(in oklab, var(--brand) 30%, #000);
+    background:linear-gradient(180deg, color-mix(in oklab, var(--brand), #fff 10%), color-mix(in oklab, var(--brand-700), #000 15%)); color:#fff; text-decoration:none; font-weight:600; box-shadow:var(--shadow); cursor:pointer; transition:.2s transform;}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border:1px solid color-mix(in oklab, var(--text) 30%, #000); color:var(--text)}
+  .chip{display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .7rem; border-radius:999px; border:1px solid color-mix(in oklab, var(--text) 25%, #000); font-weight:600}
+  .chip.ok{background:color-mix(in oklab, var(--accent) 15%, transparent); border-color:color-mix(in oklab, var(--accent), #000 30%)}
+  .chip.warn{background:color-mix(in oklab, var(--warn) 15%, transparent); border-color:color-mix(in oklab, var(--warn), #000 30%)}
+  .chip.danger{background:color-mix(in oklab, var(--danger) 15%, transparent); border-color:color-mix(in oklab, var(--danger), #000 30%)}
+
+  /* Header */
+  header{position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(10px); -webkit-backdrop-filter:blur(10px);
+    background: color-mix(in oklab, var(--bg), #000 10% / .35); border-bottom:1px solid color-mix(in oklab, var(--text) 10%, transparent);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+  .brand{display:flex; align-items:center; gap:.75rem; font-weight:800; letter-spacing:.2px}
+  .brand svg{width:34px; height:34px}
+  nav ul{display:flex; gap:1rem; list-style:none; padding:0; margin:0}
+  nav a{padding:.6rem .8rem; border-radius:999px; text-decoration:none; color:var(--text); opacity:.85}
+  nav a:hover{opacity:1; background: color-mix(in oklab, var(--text) 6%, transparent)}
+
+  /* Hero */
+  .hero{padding:clamp(56px,8vw,100px) 0 34px}
+  .hero-grid{display:grid; grid-template-columns:1.25fr 1fr; gap:var(--grid-gap); align-items:center}
+  .headline{font-size:clamp(34px,4vw,56px); line-height:1.05; letter-spacing:-.5px; margin:0 0 14px; font-weight:900}
+  .lead{font-size:clamp(16px,1.7vw,20px); color:var(--muted); margin:0 0 24px}
+  .hero-card{background:linear-gradient(180deg, color-mix(in oklab, var(--panel), #fff 2%), color-mix(in oklab, var(--panel), #000 4%));
+    border:1px solid color-mix(in oklab, var(--text) 10%, transparent); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; position:relative; overflow:hidden;}
+  .hero-art{aspect-ratio:4/3; border-radius:calc(var(--radius) - 6px);
+    background:radial-gradient(200px 200px at 15% 20%, rgba(14,165,233,.35), transparent 45%), radial-gradient(200px 200px at 85% 60%, rgba(34,197,94,.3), transparent 45%), linear-gradient(135deg, color-mix(in oklab, var(--brand-900), var(--panel) 60%), var(--panel));
+    border:1px solid color-mix(in oklab, var(--text) 8%, transparent); display:grid; place-items:center; position:relative; overflow:hidden;}
+  .phone{width:min(280px,70%); aspect-ratio:9/19; border-radius:32px; background:linear-gradient(180deg,#1f2937,#0b1220); border:2px solid #22293b;
+    box-shadow:0 20px 40px rgba(0,0,0,.45), 0 0 0 8px rgba(255,255,255,.03) inset; position:relative; padding:10px; display:grid; place-items:center;}
+  .screen{width:100%; height:100%; border-radius:24px; background:#0a1020; border:1px solid #334155; padding:8px; display:grid; gap:8px}
+  .mini-card{background:linear-gradient(180deg,#0b1730,#0c1224); border:1px solid #23324a; border-radius:14px; padding:10px}
+  .bar{height:10px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--brand));}
+
+  /* Trust bar */
+  .trust{display:grid; grid-template-columns:repeat(5,1fr); gap:var(--grid-gap); opacity:.8; padding:28px 0}
+  .trust .logo{border:1px dashed color-mix(in oklab, var(--text) 12%, transparent); border-radius:12px; padding:12px; text-align:center; font-weight:700; color:var(--muted)}
+
+  /* Sections */
+  section{padding:46px 0}
+  h2{margin:0 0 12px; font-size:clamp(24px,3vw,36px)}
+  p.section-lead{color:var(--muted); margin:0 0 22px}
+  .features{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--grid-gap)}
+  .card{background:linear-gradient(180deg, color-mix(in oklab, var(--panel), #fff 3%), color-mix(in oklab, var(--panel), #000 5%));
+    border:1px solid color-mix(in oklab, var(--text) 10%, transparent); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+  .card .title{display:flex; align-items:center; gap:.6rem; font-weight:800; margin-bottom:8px}
+  .card .title svg{width:22px; height:22px}
+
+  /* Demo uploader */
+  .demo{display:grid; grid-template-columns:1.1fr .9fr; gap:var(--grid-gap)}
+  .dropzone{border:2px dashed color-mix(in oklab, var(--text) 25%, transparent); border-radius:var(--radius); padding:22px; display:grid; gap:12px; place-items:center; text-align:center; cursor:pointer; transition:.2s border-color,.2s background; background:color-mix(in oklab, var(--panel), #fff 2%)}
+  .dropzone:hover{border-color:var(--brand); background:color-mix(in oklab, var(--brand), transparent 90%)}
+  .thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .thumb{position:relative; border-radius:12px; overflow:hidden; border:1px solid color-mix(in oklab, var(--text) 12%, transparent)}
+  .thumb img{width:100%; height:110px; object-fit:cover; display:block}
+  .thumb .badge{position:absolute; top:6px; left:6px}
+  .progress{height:10px; background:color-mix(in oklab, var(--text) 8%, transparent); border-radius:999px; overflow:hidden}
+  .progress>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--brand),var(--accent)); transition:width .6s ease}
+  .result{display:grid; gap:10px}
+  .result .status{font-size:20px; font-weight:800}
+  .result .status.ok{color:var(--accent)} .result .status.warn{color:var(--warn)} .result .status.danger{color:var(--danger)}
+  .kpi{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .kpi .k{background:color-mix(in oklab, var(--text) 6%, transparent); padding:12px; border-radius:12px; text-align:center}
+  .k .v{font-weight:900; font-size:20px}
+
+  /* Timeline */
+  .timeline{display:grid; grid-template-columns:repeat(5,1fr); gap:var(--grid-gap)}
+  .step{position:relative; padding:16px; border-radius:14px; border:1px dashed color-mix(in oklab, var(--text) 15%, transparent)}
+  .step strong{display:block; margin-bottom:6px}
+
+  /* FAQ */
+  details{border:1px solid color-mix(in oklab, var(--text) 12%, transparent); border-radius:14px; padding:14px 16px; background:color-mix(in oklab, var(--panel), #000 2%)}
+  details+details{margin-top:10px}
+  summary{cursor:pointer; font-weight:700}
+
+  /* Footer */
+  footer{padding:36px 0; border-top:1px solid color-mix(in oklab, var(--text) 10%, transparent); color:var(--muted)}
+
+  /* ==== WELCOME OVERLAY (metin daima en önde) ==== */
+  #welcomeOverlay{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    z-index:2147483647;    /* mutlak en üst katman */
+    pointer-events:auto; isolation:isolate;
+  }
+  /* arka plan + blur ayrı bir cam katmanında */
+  #welcomeOverlay .glass{
+    position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(1000px 600px at 10% 0%, rgba(14,165,233,.25), transparent 60%),
+      radial-gradient(900px 500px at 90% 100%, rgba(167,139,250,.22), transparent 60%),
+      rgba(2,6,23,.65);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+  /* aurora ışıklar */
+  #welcomeOverlay::before, #welcomeOverlay::after{
+    content:""; position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; transform:translate(-50%,-50%);
+    background:conic-gradient(from 0deg at 50% 50%, rgba(34,197,94,.35), rgba(14,165,233,.35), rgba(167,139,250,.35), rgba(244,114,182,.35), rgba(34,197,94,.35));
+    filter:blur(80px); opacity:.65; animation:spin 28s linear infinite; z-index:1; pointer-events:none;
+  }
+  #welcomeOverlay::after{animation-direction:reverse; animation-duration:45s; opacity:.5; mix-blend-mode:screen}
+
+  .welcome-card{position:relative; z-index:3; text-align:center; padding:0 6vw}
+  .welcome-title{
+    font-weight:900; font-size:clamp(48px,10vw,110px); letter-spacing:-.02em;
+    color:#fff; text-shadow:0 8px 40px rgba(0,0,0,.6);   /* NET BEYAZ METİN */
+  }
+  /* istersen gradyanı geri aç: .welcome-title.gradient sınıfını ekle */
+  .welcome-title.gradient{
+    background:linear-gradient(90deg,#22c55e,#0ea5e9 35%,#a78bfa 70%,#f472b6);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+  }
+  .welcome-title span{opacity:0; display:inline-block; transform:translateY(16px) scale(.98); animation:letterIn 600ms ease forwards}
+  .welcome-sub{color:#fff; opacity:.9; margin-top:12px; font-size:clamp(14px,2.2vw,20px)}
+  @keyframes letterIn{to{opacity:1; transform:translateY(0) scale(1)}}
+  @keyframes overlayOut{to{opacity:0; visibility:hidden}}
+  @keyframes spin{to{transform:rotate(1turn)}}
+
+  /* Responsive */
+  @media (max-width:980px){ .hero-grid{grid-template-columns:1fr} .features{grid-template-columns:repeat(2,1fr)} .demo{grid-template-columns:1fr} .timeline{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ nav ul{display:none} .features{grid-template-columns:1fr} .trust{grid-template-columns:repeat(2,1fr)} .timeline{grid-template-columns:1fr} .thumbs{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+
+<body>
+  <!-- Welcome Overlay -->
+  <div id="welcomeOverlay" role="dialog" aria-label="Hoş geldiniz">
+    <div class="glass" aria-hidden="true"></div>
+    <div class="welcome-card">
+      <div class="welcome-title" id="welcomeText">Hoşgeldiniz</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient></defs>
+        <rect x="3" y="3" width="42" height="42" rx="12" stroke="url(#g)" stroke-width="3"/>
+        <path d="M14 28c4-8 16-8 20 0" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="24" cy="19" r="4" fill="url(#g)"/></svg>
+        <span>HealTrack AI</span>
+      </div>
+      <nav aria-label="Ana menü">
+        <ul>
+          <li><a href="#home">Ana Sayfa</a></li><li><a href="#ozellikler">Özellikler</a></li><li><a href="#analiz">Analiz</a></li><li><a href="#sss">SSS</a></li><li><a href="#iletisim">İletişim</a></li>
+        </ul>
+      </nav>
+      <a class="btn" href="#analiz" aria-label="Analize başlayın"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z" fill="currentColor"/></svg>Başlayın</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div>
+        <h1 class="headline">Ameliyat Sonrası İyileşmeyi <span style="background:linear-gradient(90deg,var(--accent),var(--brand));-webkit-background-clip:text;background-clip:text;color:transparent">güvenle takip edin</span></h1>
+        <p class="lead">Yapay zeka destekli ameliyat sonrası yara analizi. Fotoğraf yükleyin, kızarıklık, şişme ve kapanma durumlarını anlık olarak değerlendirin.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn" href="#analiz">Hemen Başla</a>
+          <a class="btn btn-ghost" href="#ozellikler">Özelliklere Bak</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-art">
+          <div class="phone" aria-hidden="true">
+            <div class="screen">
+              <div class="mini-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px"><span class="chip ok">Süreç iyi</span><span class="chip">3 Gün</span></div>
+                <div class="bar" style="margin-top:10px"></div>
+              </div>
+              <div class="mini-card">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px">
+                  <div style="width:30px; height:30px; border-radius:8px; background:linear-gradient(180deg,#0ea5e9,#22c55e)"></div>
+                  <div style="flex:1"><div style="height:10px; border-radius:999px; background:#1f2a44; margin-bottom:6px"></div><div style="height:10px; width:70%; border-radius:999px; background:#1f2a44"></div></div>
+                </div>
+                <div class="bar" style="height:8px"></div>
+              </div>
+              <div class="mini-card">
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px">
+                  <div style="height:36px; border-radius:8px; background:#0f1b35"></div>
+                  <div style="height:36px; border-radius:8px; background:#0f1b35"></div>
+                  <div style="height:36px; border-radius:8px; background:#0f1b35"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <svg width="320" height="320" viewBox="0 0 320 320" fill="none" style="position:absolute; inset:auto -60px -60px auto; opacity:.35">
+            <circle cx="160" cy="160" r="120" stroke="url(#ringg)" stroke-width="2"/>
+            <circle cx="160" cy="160" r="90" stroke="url(#ringg)" stroke-width="2"/>
+            <defs><linearGradient id="ringg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient></defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="container trust" aria-label="Güven ve referanslar">
+      <div class="logo">Hospital A</div><div class="logo">Clinic B</div><div class="logo">Research C</div><div class="logo">Health D</div><div class="logo">University E</div>
+    </div>
+  </section>
+
+  <!-- Özellikler -->
+  <section id="ozellikler">
+    <div class="container">
+      <h2>Gelişmiş AI Analiz Özellikleri</h2>
+      <p class="section-lead">Computer Vision ve Machine Learning teknolojileri ile ameliyat sonrası iyileşme sürecini objektif olarak değerlendirin.</p>
+      <div class="features">
+        <div class="card"><div class="title">� AI Kızarıklık Tespiti</div><p>HSV color space analizi ile enfeksiyon belirtilerini tespit eder ve risk skorlaması yapar.</p></div>
+        <div class="card"><div class="title">📏 Şişlik Ölçümü</div><p>Kontur analizi ve morfolojik işlemlerle şişlik seviyesini objektif olarak değerlendirir.</p></div>
+        <div class="card"><div class="title">� Kapanma Analizi</div><p>Edge detection ve line transform ile dikiş kapanma durumunu hassas şekilde analiz eder.</p></div>
+        <div class="card"><div class="title">⚡ Real-time İşleme</div><p>TensorFlow ve OpenCV teknolojileri ile 2-5 saniyede hızlı analiz sonuçları.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analiz -->
+  <section id="analiz">
+    <div class="container">
+      <h2>Yapay Zeka Destekli Yara Analizi</h2>
+      <p class="section-lead">Fotoğraflarınızı yükleyin, AI modelimiz kızarıklık, şişme ve kapanma durumunu otomatik analiz etsin.</p>
+
+      <div class="demo">
+        <!-- Yükleme -->
+        <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px"><strong>Fotoğraflar</strong><span class="chip" id="fileCount">0 dosya</span></div>
+          <label class="dropzone" id="dropzone" for="fileInput" tabindex="0">
+            <div>
+              <div style="font-weight:800; font-size:18px; margin-bottom:6px">Sürükle & Bırak</div>
+              <div style="color:var(--muted)">veya <u>tıklayıp seçin</u> (PNG/JPG, maksimum 8 adet)</div>
+            </div>
+            <input id="fileInput" type="file" accept="image/*" multiple hidden aria-label="Fotoğraf yükleyin"/>
+          </label>
+          <div class="thumbs" id="thumbs" aria-live="polite"></div>
+        </div>
+
+        <!-- Sonuç -->
+        <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px">
+            <strong>Analiz</strong>
+            <div><button class="btn btn-ghost" id="clearBtn" type="button">Temizle</button><button class="btn" id="analyzeBtn" type="button">Analizi Başlat</button></div>
+          </div>
+          <div style="display:grid; gap:12px">
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px"><span>İlerleme</span><span id="progressText" class="chip">%0</span></div>
+              <div class="progress" aria-label="İlerleme durumu"><span id="progressBar"></span></div>
+            </div>
+
+            <div class="result" id="resultBox" hidden>
+              <div id="statusLine" class="status">—</div>
+              <div class="kpi">
+                <div class="k"><div class="v" id="kpiInflammation">—</div><div style="opacity:.7">Kızarıklık</div></div>
+                <div class="k"><div class="v" id="kpiSwelling">—</div><div style="opacity:.7">Şişlik</div></div>
+                <div class="k"><div class="v" id="kpiClosure">—</div><div style="opacity:.7">Kapanma</div></div>
+              </div>
+              <div id="tags" style="display:flex; gap:8px; flex-wrap:wrap"></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap">
+                <button class="btn" id="downloadBtn" type="button">Raporu İndir (HTML)</button>
+                <button class="btn btn-ghost" id="resetBtn" type="button">Yeni Analiz</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section>
+    <div class="container">
+      <h2>İyileşme Yolculuğu (Genel)</h2>
+      <p class="section-lead">Her ameliyat farklıdır; aşağıdaki adımlar genel bir çerçevedir. Kendi hekiminizin talimatlarını takip edin.</p>
+      <div class="timeline">
+        <div class="step"><strong>1. İlk 24 Saat</strong> Ağrı ve hafif sızıntı normal olabilir. Bandajı kuru tutun.</div>
+        <div class="step"><strong>2. Gün 2–3</strong> Kızarıklık/şişlikte azalma beklenir. Aşırı artışta hekiminize danışın.</div>
+        <div class="step"><strong>3. Gün 4–7</strong> Kapanma artar, ağrı azalır. Bölgeyi temiz ve kuru tutun.</div>
+        <div class="step"><strong>4. Hafta 2–3</strong> Kaşıntı ve hafif kabuklanma görülebilir; koparmayın.</div>
+        <div class="step"><strong>5. Ay 1+</strong> İz olgunlaşması; güneşten koruyun, önerilen kremi kullanın.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SSS -->
+  <section id="sss">
+    <div class="container">
+      <h2>Sık Sorulan Sorular</h2>
+      <div style="display:grid; gap:10px; max-width:840px">
+        <details><summary>Sistem nasıl çalışır?</summary><div>Fotoğraf yüklendikten sonra kurumunuzun model katmanı görseli işler; arayüz kızarıklık, şişlik ve kapanma gibi metrikleri görselleştirir.</div></details>
+        <details><summary>Veri güvenliği</summary><div>Fotoğraflar, kurum politikanıza uygun şekilde işlenir. Şablon istemci tarafı önizleme ve saklama politikalarına uyumludur.</div></details>
+        <details><summary>Rapor ve yönlendirmeler</summary><div>Model çıktısına göre rapor indirme, trend izleme ve gerekirse hekime yönlendirme aksiyonları sunulur.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- İletişim -->
+  <section id="iletisim">
+    <div class="container">
+      <h2>İletişim</h2>
+      <p class="section-lead">Sorularınız için bizimle iletişime geçin. Teknik destek ve kurumsal çözümler için 7/24 hizmet.</p>
+      <div class="card" style="display:grid; gap:12px; max-width:720px">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+          <input id="name" placeholder="Adınız" style="padding:12px; border-radius:10px; background:transparent; border:1px solid color-mix(in oklab, var(--text) 15%, transparent); color:inherit"/>
+          <input id="email" placeholder="E-posta" type="email" style="padding:12px; border-radius:10px; background:transparent; border:1px solid color-mix(in oklab, var(--text) 15%, transparent); color:inherit"/>
+        </div>
+        <textarea id="msg" rows="4" placeholder="Mesajınız" style="padding:12px; border-radius:10px; background:transparent; border:1px solid color-mix(in oklab, var(--text) 15%, transparent); color:inherit"></textarea>
+        <div style="display:flex; gap:10px; align-items:center"><button class="btn" type="button" onclick="alert('Teşekkürler! Mesajınız alındı.')">Gönder</button></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between">
+      <div>© <span id="year"></span> HealTrack AI • Tüm hakları saklıdır.</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+        <a class="chip" href="#">Gizlilik</a><a class="chip" href="#">Kullanım Şartları</a><button class="chip" type="button" id="themeToggle" aria-label="Tema değiştir (açık/koyu)">🌓 Tema</button>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  /* Hoş geldiniz animasyonu */
+  (function(){
+    try{
+      const overlay = document.getElementById('welcomeOverlay');
+      const title = document.getElementById('welcomeText');
+      if(!overlay || !title) return;
+
+      document.documentElement.style.overflow='hidden';
+      const text = title.textContent; title.textContent='';
+      [...text].forEach((ch,i)=>{
+        const s=document.createElement('span');
+        s.textContent=ch; s.style.animationDelay=(i*60)+'ms';
+        title.appendChild(s);
+      });
+
+      overlay.style.display='flex';
+
+      setTimeout(()=>{
+        overlay.style.animation='overlayOut 900ms ease forwards';
+        setTimeout(()=>{ overlay.style.display='none'; document.documentElement.style.overflow=''; }, 950);
+      }, 3000);
+
+      overlay.addEventListener('click', ()=>{
+        overlay.style.animation='overlayOut 600ms ease forwards';
+        setTimeout(()=>{ overlay.style.display='none'; document.documentElement.style.overflow=''; }, 650);
+      });
+    }catch(e){}
+  })();
+
+  /* Tema toggler */
+  const themeToggle=document.getElementById('themeToggle');
+  const prefersLight=window.matchMedia('(prefers-color-scheme: light)').matches;
+  const savedTheme=localStorage.getItem('theme');
+  if(savedTheme){ document.documentElement.dataset.theme=savedTheme; }
+  themeToggle?.addEventListener('click', ()=>{
+    const cur=document.documentElement.dataset.theme;
+    const next=!cur?(prefersLight?'dark':'light'):(cur==='light'?'dark':'light');
+    document.documentElement.dataset.theme=next;
+    if(next==='light'){
+      const r=document.querySelector(':root');
+      r.style.setProperty('--bg','#f7fbff'); r.style.setProperty('--panel','#ffffff'); r.style.setProperty('--muted','#475569'); r.style.setProperty('--text','#0f172a');
+      r.style.setProperty('--brand','#0284c7'); r.style.setProperty('--brand-900','#e0f2fe'); r.style.setProperty('--brand-700','#0ea5e9');
+      r.style.setProperty('--accent','#16a34a'); r.style.setProperty('--warn','#d97706'); r.style.setProperty('--danger','#dc2626');
+    }else{ location.reload(); }
+    localStorage.setItem('theme', next);
+  });
+
+  /* Yıl */
+  document.getElementById('year').textContent=new Date().getFullYear();
+
+  /* Demo analiz (mock) */
+  const dropzone=document.getElementById('dropzone');
+  const fileInput=document.getElementById('fileInput');
+  const thumbs=document.getElementById('thumbs');
+  const fileCount=document.getElementById('fileCount');
+  const analyzeBtn=document.getElementById('analyzeBtn');
+  const clearBtn=document.getElementById('clearBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const resultBox=document.getElementById('resultBox');
+  const progressBar=document.getElementById('progressBar');
+  const progressText=document.getElementById('progressText');
+  const statusLine=document.getElementById('statusLine');
+  const kpiInflammation=document.getElementById('kpiInflammation');
+  const kpiSwelling=document.getElementById('kpiSwelling');
+  const kpiClosure=document.getElementById('kpiClosure');
+  const tags=document.getElementById('tags');
+  const downloadBtn=document.getElementById('downloadBtn');
+
+  let files=[];
+  const updateFileCount=()=>{ fileCount.textContent=`${files.length} dosya`; };
+  const renderThumbs=()=>{ thumbs.innerHTML=''; files.slice(0,8).forEach((file,idx)=>{ const wrap=document.createElement('div'); wrap.className='thumb';
+    const img=document.createElement('img'); img.alt=`Fotoğraf ${idx+1}`; const reader=new FileReader(); reader.onload=e=>img.src=e.target.result; reader.readAsDataURL(file);
+    const badge=document.createElement('span'); badge.className='badge chip'; badge.textContent=`#${idx+1}`; wrap.appendChild(img); wrap.appendChild(badge); thumbs.appendChild(wrap); }); updateFileCount(); };
+
+  const onFiles=list=>{ const arr=Array.from(list).filter(f=>f.type.startsWith('image/')); files=arr.slice(0,8); renderThumbs(); resultBox.hidden=true; progressBar.style.width='0%'; progressText.textContent='%0'; };
+
+  dropzone.addEventListener('dragover',e=>{e.preventDefault(); dropzone.style.borderColor='var(--brand)';});
+  dropzone.addEventListener('dragleave',()=>{dropzone.style.borderColor='';});
+  dropzone.addEventListener('drop',e=>{e.preventDefault(); onFiles(e.dataTransfer.files); dropzone.style.borderColor='';});
+  dropzone.addEventListener('click',()=>fileInput.click());
+  dropzone.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ fileInput.click(); }});
+  fileInput.addEventListener('change',e=>onFiles(e.target.files));
+
+  clearBtn.addEventListener('click',()=>{ files=[]; renderThumbs(); });
+
+  resetBtn?.addEventListener('click',()=>{ resultBox.hidden=true; progressBar.style.width='0%'; progressText.textContent='%0'; });
+
+  // API Configuration
+  const API_BASE_URL = 'http://localhost:8000';
+  const API_TIMEOUT = 30000; // 30 saniye
+
+  async function analyzeWithAI(){
+    if(files.length===0){ 
+      alert('Lütfen en az bir fotoğraf yükleyin.'); 
+      return; 
+    }
+    
+    resultBox.hidden=true; 
+    tags.innerHTML='';
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = 'Analiz Ediliyor...';
+    
+    // Progress animation
+    let p=0; 
+    progressBar.style.width='0%'; 
+    progressText.textContent='%0';
+    
+    const progressTimer = setInterval(()=>{ 
+      p += Math.floor(Math.random()*8)+2; 
+      if(p > 95) p = 95; // API yanıtı gelene kadar %95'te bekle
+      progressBar.style.width = p+'%'; 
+      progressText.textContent = '%'+p; 
+    }, 200);
+    
+    try {
+      // İlk görüntüyü API'ye gönder
+      const firstFile = files[0];
+      const base64Data = await fileToBase64(firstFile);
+      
+      const response = await fetch(`${API_BASE_URL}/api/analyze-wound`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image_data: base64Data,
+          patient_id: generatePatientId(),
+          notes: `${files.length} fotoğraf analizi`
+        }),
+        signal: AbortSignal.timeout(API_TIMEOUT)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API Hatası: ${response.status} - ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      // Progress'i tamamla
+      clearInterval(progressTimer);
+      progressBar.style.width = '100%'; 
+      progressText.textContent = '%100';
+      
+      // Sonuçları göster
+      displayAnalysisResult(result);
+      
+    } catch (error) {
+      clearInterval(progressTimer);
+      console.error('Analiz hatası:', error);
+      
+      if (error.name === 'TimeoutError') {
+        alert('Analiz zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message.includes('Failed to fetch')) {
+        alert('API sunucusuna bağlanılamıyor. Sunucunun çalıştığından emin olun.');
+        // Fallback: Demo analiz
+        buildFakeResult();
+      } else {
+        alert('Analiz sırasında hata oluştu: ' + error.message);
+      }
+      
+      progressBar.style.width = '0%'; 
+      progressText.textContent = '%0';
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = 'Analizi Başlat';
+    }
+  }
+
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function generatePatientId() {
+    return 'PT-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+  }
+
+  function displayAnalysisResult(result) {
+    // Skorları güncelle
+    kpiInflammation.textContent = Math.round(result.inflammation_score) + '%';
+    kpiSwelling.textContent = Math.round(result.swelling_score) + '%';
+    kpiClosure.textContent = Math.round(result.closure_score) + '%';
+    
+    // Durum göstergesi
+    const statusMap = {
+      'good': { class: 'ok', text: 'İyileşme iyi durumda' },
+      'warning': { class: 'warn', text: 'Yakın takip gerekli' },
+      'critical': { class: 'danger', text: 'Acil tıbbi müdahale önerilir' },
+      'error': { class: 'danger', text: 'Analiz hatası' }
+    };
+    
+    const status = statusMap[result.overall_status] || statusMap['error'];
+    statusLine.className = 'status ' + status.class;
+    statusLine.textContent = status.text;
+    
+    // Önerileri göster
+    tags.innerHTML = '';
+    if (result.recommendations && result.recommendations.length > 0) {
+      result.recommendations.forEach(recommendation => {
+        const chip = document.createElement('span');
+        chip.className = 'chip ' + status.class;
+        chip.textContent = recommendation;
+        tags.appendChild(chip);
+      });
+    }
+    
+    // Güven skoru göster (opsiyonel)
+    if (result.confidence) {
+      const confidenceChip = document.createElement('span');
+      confidenceChip.className = 'chip';
+      confidenceChip.textContent = `Güven: %${Math.round(result.confidence * 100)}`;
+      tags.appendChild(confidenceChip);
+    }
+    
+    resultBox.hidden = false;
+    
+    // Başarı bildirimi
+    showNotification('✅ Analiz tamamlandı!', 'success');
+  }
+
+  function buildFakeResult(){
+    // Fallback demo analiz (API erişilemediğinde)
+    const names=files.map(f=>(f.name||'').toLowerCase()).join(' ');
+    const redFlags=/(kizar|red|pusu|irin|enfeks|infection|koku|ate|fever|swelling|abscess)/i.test(names);
+    const midFlags=/(sari|yellow|serum|siv|akint|discharge|itch|kasinti)/i.test(names);
+    const infl=Math.round((redFlags?65:midFlags?40:18)+Math.random()*20);
+    const swell=Math.round((redFlags?60:midFlags?35:20)+Math.random()*18);
+    const closure=Math.round((redFlags?45:midFlags?60:78)+Math.random()*12);
+    
+    const demoResult = {
+      inflammation_score: infl,
+      swelling_score: swell,
+      closure_score: closure,
+      overall_status: redFlags ? 'critical' : (midFlags ? 'warning' : 'good'),
+      recommendations: redFlags ? 
+        ['Doktora başvurun', 'Enfeksiyon riski var'] : 
+        midFlags ? 
+        ['Yakın takip edin', 'Hijyen önemli'] : 
+        ['İyileşme normal', 'Takip devam edin'],
+      confidence: 0.85
+    };
+    
+    displayAnalysisResult(demoResult);
+    showNotification('⚠️ Demo analiz (API bağlantısı yok)', 'warning');
+  }
+
+  function showNotification(message, type = 'info') {
+    // Basit bildirim sistemi
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      padding: 12px 20px; border-radius: 8px; color: white;
+      background: ${type === 'success' ? 'var(--accent)' : type === 'warning' ? 'var(--warn)' : 'var(--brand)'};
+      box-shadow: var(--shadow); font-weight: 600;
+      transform: translateX(100%); transition: transform 0.3s ease;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animasyon
+    setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
+  }
+  analyzeBtn.addEventListener('click', analyzeWithAI);
+
+  /* Rapor indir (HTML) */
+  downloadBtn.addEventListener('click', ()=>{
+    const parts=[
+      '<!DOCTYPE html><html lang=\'tr\'><head><meta charset=\'utf-8\'><title>HealTrack - İyileşme Raporu<\/title><\/head>',
+      '<body style=\'font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial\'>',
+      '<h1>İyileşme Raporu<\/h1>',
+      '<p><strong>Durum:<\/strong> '+statusLine.textContent+'<\/p>',
+      '<ul><li>Kızarıklık: '+kpiInflammation.textContent+'<\/li>',
+      '<li>Şişlik: '+kpiSwelling.textContent+'<\/li>',
+      '<li>Kapanma: '+kpiClosure.textContent+'<\/li><\/ul>',
+      '<\/body><\/html>'
+    ];
+    const html=parts.join(''); const blob=new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='healtrack-rapor.html'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500);
+  });
+</script>
+</body>
+</html>
