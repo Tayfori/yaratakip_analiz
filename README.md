@@ -1,0 +1,1 @@
+# yaratakip_analiz
