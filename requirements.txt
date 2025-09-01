@@ -1,11 +1,9 @@
-# Ultra Minimal Requirements - Render Free Tier
-# Sadece gerekli paketler, memory: ~40-60MB
+# No OpenCV - Ultra Minimal Requirements
+# Memory: ~20-30MB
 
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 pydantic==2.5.0
 
-# Minimal image processing
-opencv-python-headless==4.8.1.78
+# Only PIL for image processing
 Pillow==10.1.0
-numpy==1.24.4
