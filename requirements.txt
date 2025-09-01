@@ -1,9 +1,6 @@
-# No OpenCV - Ultra Minimal Requirements
-# Memory: ~20-30MB
+# Render Free Tier için ULTRA minimal requirements
+# Python standard library + minimal web framework
 
 fastapi==0.104.1
-uvicorn[standard]==0.24.0
+uvicorn==0.24.0
 pydantic==2.5.0
-
-# Only PIL for image processing
-Pillow==10.1.0
